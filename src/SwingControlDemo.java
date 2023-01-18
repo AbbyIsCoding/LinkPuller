@@ -5,24 +5,30 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import javax.swing.*;
 
-
 public class SwingControlDemo implements ActionListener {
     private JFrame mainFrame;
     private JLabel headerLabel;
     private JLabel statusLabel;
-    private JPanel controlPanel;
-    private JPanel searchPanel;
-    private JPanel printPanel;
+    private JPanel controlPanel;    //Don't actually use this
+    private JPanel searchPanel;     //Where you put the link
+    private JPanel printPanel;      //Where all of the hyper links get printed
     private JMenuBar mb;
-    private JMenu file, edit, help;
-    private JMenuItem cut, copy, paste, selectAll;
-    private JTextField ta;
-    private JTextField la;
-    private JTextArea pa;
+    private JMenu file, edit, help;     //Don't actually use this
+    private JMenuItem cut, copy, paste, selectAll;  //Don't use this LOL
+    private JTextField ta;  //Don't use this either !
+    private JTextField la;  //The Textfield where you put the link in
+    private JTextField keySearch;
+    private JTextArea pa = new JTextArea(20,20); //"Print Area", where the hyper links actually get added
+    private JScrollPane scrollLinks = new JScrollPane(pa);  //Makes pa scrollable
+    // Sets frame dimensions
     private int WIDTH=800;
     private int HEIGHT=700;
 
+    //for the keyword search
+    private String searchTerm;
 
+    //url thingy
+    private String urlString;
 
 
 
@@ -37,11 +43,11 @@ public class SwingControlDemo implements ActionListener {
     }
 
     private void prepareGUI() {
+
         mainFrame = new JFrame("Java SWING Examples");
         mainFrame.setSize(WIDTH, HEIGHT);
-        mainFrame.setLayout(new GridLayout(4,1));
+        mainFrame.setLayout(new GridLayout(2,1));
         mainFrame.getContentPane().setBackground(Color.black);
-
 
         cut = new JMenuItem("cut");
         copy = new JMenuItem("copy");
@@ -64,19 +70,26 @@ public class SwingControlDemo implements ActionListener {
         mb.add(edit);
         mb.add(help);
 
-        //    ta = new JTextField(20);
-        //   ta.setBounds(50, 30, WIDTH-400, HEIGHT-50);
+
         // link thingy
         la = new JTextField("Paste Link Here",20);
         la.setBounds(50,5,WIDTH-300, HEIGHT-50);
+
         // text links area print area
         pa = new JTextArea();
         pa.setBounds(100,100,WIDTH-100,HEIGHT-100);
 
+        //keyword search thing
+        keySearch = new JTextField("Enter Keyword");
+
+
+        //making pa scrollable
+        scrollLinks = new JScrollPane(pa);
+        scrollLinks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
 
 
         mainFrame.add(mb);
-
         mainFrame.setJMenuBar(mb);
 
         headerLabel = new JLabel("", JLabel.CENTER);
@@ -88,6 +101,8 @@ public class SwingControlDemo implements ActionListener {
                 System.exit(0);
             }
         });
+
+        //This is where the search button is
         controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
 
@@ -95,26 +110,15 @@ public class SwingControlDemo implements ActionListener {
         searchPanel.setLayout(new FlowLayout());
 
         printPanel = new JPanel();
-        printPanel.setLayout(new GridLayout(2,1));
+        printPanel.setLayout(new GridLayout(1,1));
 
+        searchPanel.add(controlPanel);
+        searchPanel.add(keySearch);
 
-
-        // mainFrame.add(headerLabel);
-        //        mainFrame.add(la);
         mainFrame.add(searchPanel);
-        mainFrame.add(controlPanel);
-
-        //        statusLabel.setText("this is the status label");
-        // mainFrame.add(statusLabel);
-        //        mainFrame.add(ta);
+      //  mainFrame.add(controlPanel);
         mainFrame.add(printPanel);
-
-
-
         mainFrame.setVisible(true);
-
-
-
     }
 
     private void showEventDemo() {
@@ -136,11 +140,12 @@ public class SwingControlDemo implements ActionListener {
 
         searchPanel.add(la);
         controlPanel.add(okButton);
-        printPanel.add(pa);
+        printPanel.add(scrollLinks);
         mainFrame.setVisible(true);
     }
 
     @Override
+    //Doesn't actually do anything because I got rid of this textfield but if I take it out my code gets mad at me so I'm leaving it in
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == cut)
             ta.cut();
@@ -150,72 +155,73 @@ public class SwingControlDemo implements ActionListener {
             ta.copy();
     }
 
-    public void HtmlRead(){
+    public void LinkPullerTest2() { // Should this be void or not???
+
         try {
             System.out.println();
-            URL url = new URL(la.getText());
-            //url = new URL("https://www.milton.edu/");
+            URL url = new URL("https://www.milton.edu/");
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(url.openStream())
             );
             String line;
             while ( (line = reader.readLine()) != null ) {
 
+                if (line.contains("href")) {
 
-                if (line.contains("https")) {
-                    int start = line.indexOf("https");
-                    String line1 = line.substring(start);
-                   System.out.println("not chopped " +line1);
+                    try {
 
-                    int end = line1.indexOf("https", start + 1);
+                        int start = line.indexOf("https");
+                        int enddouble = line.indexOf("\"", start);
+                        int endsingle = line.indexOf("'", start);
+                        int end;
+                        if(endsingle< enddouble && endsingle != -1)
+                        {
+                            end = endsingle;
+                        }else if (enddouble != -1){
+                            end = enddouble;
+                        }
+                        else{
+                            end = 0;
+                        }
 
-                    while (end >= 1) {
+                        String link = line.substring(start, end);
+                        if(link.contains(searchTerm)) {
+                            System.out.println(link);
 
-                        start = line1.indexOf("https");
-
-                       // if (end == -1) {
-
-                            if(line1.indexOf(" ", start + 1)>0){
-                                end = line1.indexOf(" ", start + 1);
-                            }
-                            else if (line1.indexOf(" *", start + 1)>0){
-                                end = line1.indexOf(" *", start + 1);
-                            }
-
-
-                        System.out.println(start);
-
-                        System.out.println(end);
-                        System.out.println(line1);
-
-                        // }
-
-                        String indexLine = line1.substring(0, end);
-                        System.out.println(indexLine);
-                        pa.append(line);
-
-
-                        // moved this to the end from the beginning of while loop bc we want to change where we are searching
-                        start = end;
-                        end = line1.indexOf("https", start + 1);
-                        line1 = line1.substring(end);
-                    }
-                    if (end == -1) {
-                        end = line1.indexOf("\" ", start + 1);
+                            pa.append(link + "\n");
+                        }
+                    } catch(Exception e){
 
                     }
 
-                    String indexLine = line1.substring(0, end);
-                    System.out.println(indexLine);
-                    pa.append(line);
+
+
+//                    while (end >= 1) {
+//                        String link = line.substring(start, end);
+//                        System.out.println(link);
+//
+//
+//                        line = line.substring(end+1);
+//                        start = line.indexOf("https");
+//
+//                        end = line.indexOf("\"", start);
+////                        pa.setText(link); // is this where that goes?
+//                        pa.append(link + "\n");
+//
+//                    }
+
                 }
+
             }
+
             reader.close();
         } catch(Exception ex) {
             System.out.println(ex);
         }
 
+
     }
+//
 
 
     private class ButtonClickListener implements ActionListener {
@@ -223,8 +229,10 @@ public class SwingControlDemo implements ActionListener {
             String command = e.getActionCommand();
 
             if (command.equals("Go")) {
-                HtmlRead();
-                statusLabel.setText("Go Button clicked.");
+             searchTerm = keySearch.getText();
+             urlString = pa.getText();
+               LinkPullerTest2();
+               statusLabel.setText("Go Button clicked.");
 
             } else if (command.equals("Submit")) {
                 statusLabel.setText("Submit Button clicked.");

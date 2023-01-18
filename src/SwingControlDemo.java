@@ -159,7 +159,9 @@ public class SwingControlDemo implements ActionListener {
 
         try {
             System.out.println();
-            URL url = new URL("https://www.milton.edu/");
+           // URL url = new URL("https://www.milton.edu/");
+            URL url = new URL(urlString);
+
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(url.openStream())
             );
@@ -230,7 +232,7 @@ public class SwingControlDemo implements ActionListener {
 
             if (command.equals("Go")) {
              searchTerm = keySearch.getText();
-             urlString = pa.getText();
+             urlString = la.getText();
                LinkPullerTest2();
                statusLabel.setText("Go Button clicked.");
 

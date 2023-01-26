@@ -198,20 +198,7 @@ public class SwingControlDemo implements ActionListener {
 
 
 
-//                    while (end >= 1) {
-//                        String link = line.substring(start, end);
-//                        System.out.println(link);
 //
-//
-//                        line = line.substring(end+1);
-//                        start = line.indexOf("https");
-//
-//                        end = line.indexOf("\"", start);
-////                        pa.setText(link); // is this where that goes?
-//                        pa.append(link + "\n");
-//
-//                    }
-
                 }
 
             }
@@ -231,6 +218,7 @@ public class SwingControlDemo implements ActionListener {
             String command = e.getActionCommand();
 
             if (command.equals("Go")) {
+             pa.setText("");
              searchTerm = keySearch.getText();
              urlString = la.getText();
                LinkPullerTest2();
